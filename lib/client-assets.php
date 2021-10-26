@@ -792,9 +792,18 @@ function gutenberg_resolve_assets( $assets ) {
 add_filter(
 	'block_editor_settings_all',
 	function( $settings ) {
-		$settings['assets'] = gutenberg_get_block_editor_assets();
+		$assets = gutenberg_get_block_editor_assets();
+
+		if ( $settings['assets'] ) {
+			$settings['assets']['styles']  = array_merge( $settings['assets']['styles'], $assets['styles'] );
+			$settings['assets']['scripts'] = array_merge( $settings['assets']['scripts'], $assets['scripts'] );
+		} else {
+			$settings['assets'] = $assets;
+		}
+
 		return $settings;
-	}
+	},
+	9
 );
 
 add_filter(
