@@ -710,7 +710,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 /**
  * Sets the editor styles to be consumed by JS.
  */
-function gutenberg_extend_block_editor_styles_html() {
+function gutenberg_get_block_editor_assets() {
 	global $pagenow;
 
 	$script_handles = array();
@@ -742,39 +742,66 @@ function gutenberg_extend_block_editor_styles_html() {
 		}
 	}
 
-	$style_handles = array_unique( $style_handles );
-	$done          = wp_styles()->done;
+	$style_handles  = array_unique( $style_handles );
+	$script_handles = array_unique( $script_handles );
+
+	$script_handles = array_diff( $script_handles, array( 'wp-reset-editor-styles' ) );
+
+	return array(
+		'styles'  => $style_handles,
+		'scripts' => $script_handles,
+	);
+}
+
+/**
+ * Resolves WP dependency handles for both styles and scripts to HTML.
+ * To do: ideally this should be a list of URLs and inline styles/scripts.
+ *
+ * @param array $assets WP dependency handles.
+ *
+ * @return array HTML for both styles and scripts
+ */
+function gutenberg_resolve_assets( $assets ) {
+	$done = wp_styles()->done;
 
 	ob_start();
 
 	// We do not need reset styles for the iframed editor.
-	wp_styles()->done = array( 'wp-reset-editor-styles' );
-	wp_styles()->do_items( $style_handles );
+	wp_styles()->done = array();
+	wp_styles()->do_items( $assets['styles'] );
 	wp_styles()->done = $done;
 
 	$styles = ob_get_clean();
 
-	$script_handles = array_unique( $script_handles );
-	$done           = wp_scripts()->done;
+	$done = wp_scripts()->done;
 
 	ob_start();
 
 	wp_scripts()->done = array();
-	wp_scripts()->do_items( $script_handles );
+	wp_scripts()->do_items( $assets['scripts'] );
 	wp_scripts()->done = $done;
 
 	$scripts = ob_get_clean();
 
-	$editor_assets = wp_json_encode(
-		array(
-			'styles'  => $styles,
-			'scripts' => $scripts,
-		)
+	return array(
+		'styles'  => $styles,
+		'scripts' => $scripts,
 	);
-
-	echo "<script>window.__editorAssets = $editor_assets</script>";
 }
-add_action( 'admin_footer-appearance_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-widgets.php', 'gutenberg_extend_block_editor_styles_html' );
+
+add_filter(
+	'block_editor_settings_all',
+	function( $settings ) {
+		$settings['assets'] = gutenberg_get_block_editor_assets();
+		return $settings;
+	}
+);
+
+add_filter(
+	'block_editor_settings_all',
+	function( $settings ) {
+		$settings['resolvedAssets'] = gutenberg_resolve_assets( $settings['assets'] );
+		return $settings;
+	},
+	100
+);

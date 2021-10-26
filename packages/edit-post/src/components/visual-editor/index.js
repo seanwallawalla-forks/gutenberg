@@ -43,7 +43,14 @@ import { __ } from '@wordpress/i18n';
 import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
+function MaybeIframe( {
+	children,
+	contentRef,
+	shouldIframe,
+	styles,
+	assets,
+	style,
+} ) {
 	const ref = useMouseMoveTypingReset();
 
 	if ( ! shouldIframe ) {
@@ -65,6 +72,7 @@ function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	return (
 		<Iframe
 			head={ <EditorStyles styles={ styles } /> }
+			assets={ assets }
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
@@ -107,9 +115,12 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().supportsLayout;
+	const { themeSupportsLayout, assets } = useSelect( ( select ) => {
+		const _settings = select( blockEditorStore ).getSettings();
+		return {
+			themeSupportsLayout: _settings.supportsLayout,
+			assets: _settings.resolvedAssets,
+		};
 	}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
@@ -218,6 +229,7 @@ export default function VisualEditor( { styles } ) {
 						}
 						contentRef={ contentRef }
 						styles={ styles }
+						assets={ assets }
 						style={ { paddingBottom } }
 					>
 						{ themeSupportsLayout && ! isTemplateMode && (
