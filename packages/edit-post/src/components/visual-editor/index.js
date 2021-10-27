@@ -52,11 +52,12 @@ function MaybeIframe( {
 	style,
 } ) {
 	const ref = useMouseMoveTypingReset();
+	const editorStyles = <EditorStyles styles={ styles } assets={ assets } />;
 
 	if ( ! shouldIframe ) {
 		return (
 			<>
-				<EditorStyles styles={ styles } />
+				{ editorStyles }
 				<WritingFlow
 					ref={ contentRef }
 					className="editor-styles-wrapper"
@@ -71,7 +72,7 @@ function MaybeIframe( {
 
 	return (
 		<Iframe
-			head={ <EditorStyles styles={ styles } /> }
+			head={ editorStyles }
 			assets={ assets }
 			ref={ ref }
 			contentRef={ contentRef }

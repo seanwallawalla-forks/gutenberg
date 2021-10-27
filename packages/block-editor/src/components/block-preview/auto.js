@@ -46,7 +46,9 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 				} }
 			>
 				<Iframe
-					head={ <EditorStyles styles={ styles } /> }
+					head={
+						<EditorStyles styles={ styles } assets={ assets } />
+					}
 					assets={ assets }
 					contentRef={ useRefEffect( ( bodyElement ) => {
 						const {

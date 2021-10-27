@@ -311,7 +311,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-nux' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-nux' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
@@ -348,23 +348,8 @@ function gutenberg_register_packages_styles( $styles ) {
 	$wp_edit_blocks_dependencies = array(
 		'wp-components',
 		'wp-editor',
-		// This need to be added before the block library styles,
-		// The block library styles override the "reset" styles.
-		'wp-reset-editor-styles',
-		'wp-block-library',
 		'wp-reusable-blocks',
 	);
-
-	// Only load the default layout and margin styles for themes without theme.json file.
-	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$wp_edit_blocks_dependencies[] = 'wp-editor-classic-layout-styles';
-	}
-
-	global $editor_styles;
-	if ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) {
-		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
-		$wp_edit_blocks_dependencies[] = 'wp-block-library-theme';
-	}
 
 	gutenberg_override_style(
 		$styles,
@@ -717,9 +702,20 @@ function gutenberg_get_block_editor_assets() {
 	$style_handles  = array(
 		'wp-block-editor',
 		'wp-block-library',
-		'wp-block-library-theme',
 		'wp-edit-blocks',
+		'wp-reset-editor-styles',
 	);
+
+	// Only load the default layout and margin styles for themes without theme.json file.
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		$style_handles[] = 'wp-editor-classic-layout-styles';
+	}
+
+	global $editor_styles;
+	if ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) {
+		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
+		$style_handles[] = 'wp-block-library-theme';
+	}
 
 	if ( 'widgets.php' === $pagenow || 'customize.php' === $pagenow ) {
 		$style_handles[] = 'wp-widgets';
@@ -744,8 +740,6 @@ function gutenberg_get_block_editor_assets() {
 
 	$style_handles  = array_unique( $style_handles );
 	$script_handles = array_unique( $script_handles );
-
-	$script_handles = array_diff( $script_handles, array( 'wp-reset-editor-styles' ) );
 
 	return array(
 		'styles'  => $style_handles,
