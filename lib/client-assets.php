@@ -300,6 +300,15 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
+		'wp-block-editor-styles',
+		gutenberg_url( 'build/block-editor/editor-styles.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-block-editor-styles', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-nux', 'wp-reusable-blocks' ),
@@ -345,17 +354,11 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-format-library', 'rtl', 'replace' );
 
-	$wp_edit_blocks_dependencies = array(
-		'wp-components',
-		'wp-editor',
-		'wp-reusable-blocks',
-	);
-
 	gutenberg_override_style(
 		$styles,
 		'wp-reset-editor-styles',
 		gutenberg_url( 'build/block-library/reset.css' ),
-		array( 'common', 'forms' ), // Make sure the reset is loaded after the default WP Adminn styles.
+		array(),
 		$version
 	);
 	$styles->add_data( 'wp-reset-editor-styles', 'rtl', 'replace' );
@@ -373,7 +376,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-blocks',
 		gutenberg_url( 'build/block-library/editor.css' ),
-		$wp_edit_blocks_dependencies,
+		array(),
 		$version
 	);
 	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
@@ -700,8 +703,7 @@ function gutenberg_get_block_editor_assets() {
 
 	$script_handles = array();
 	$style_handles  = array(
-		'wp-block-editor',
-		'wp-block-library',
+		'wp-block-editor-styles',
 		'wp-edit-blocks',
 		'wp-reset-editor-styles',
 	);
