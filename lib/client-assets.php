@@ -704,6 +704,8 @@ function gutenberg_get_block_editor_assets() {
 	$script_handles = array();
 	$style_handles  = array(
 		'wp-block-editor-styles',
+		'wp-block-library',
+		'wp-block-library-theme',
 		'wp-edit-blocks',
 		'wp-reset-editor-styles',
 	);
